@@ -1,11 +1,15 @@
 {
-  "name": "markpro-code.github.io",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/markpro-code/markpro-code.github.io.git",
-  "author": "markpro-code <markpro.code@gmail.com>",
-  "license": "MIT",
-  "devDependencies": {
-    "browser-sync": "^2.24.5"
-  }
+    "name": "markpro-code.github.io",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "https://github.com/markpro-code/markpro-code.github.io.git",
+    "author": "markpro-code <markpro.code@gmail.com>",
+    "license": "MIT",
+    "scripts": {
+        "start": "docsify serve ./docs -o"
+    },
+    "devDependencies": {
+        "browser-sync": "^2.24.5"
+    },
+    "dependencies": {}
 }
