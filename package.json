@@ -6,7 +6,7 @@
     "author": "markpro-code <markpro.code@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "start": "docsify serve ./docs -o"
+        "start": "docsify serve ./ -o"
     },
     "devDependencies": {
         "browser-sync": "^2.24.5"
