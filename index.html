@@ -13,9 +13,26 @@
   <script>
     window.$docsify = {
       name: 'markpro-code.github.io',
-      repo: 'https://github.com/markpro-code/markpro-code.github.io'
+      repo: 'https://github.com/markpro-code/markpro-code.github.io',
+      loadNavbar: true,
+      loadSidebar: true,
+      subMaxLevel: 2,
+
+      search: {
+          placeholder: {
+              '/zh-cn/': '搜索',
+              '/': 'Type to search'
+          },
+          noData: {
+              '/zh-cn/': '找不到结果',
+              '/': 'No Results'
+          },
+      }
     }
   </script>
   <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+  <script src="//unpkg.com/docsify-copy-code"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/emoji.min.js"></script>
 </body>
 </html>
