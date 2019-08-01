@@ -1,1 +1,26 @@
-remote_theme: "mmistakes/jekyll-theme-basically-basic"
+# remote_theme: thelehhman/plainwhite-jekyll
+# theme: plainwhite
+search: true
+
+
+plainwhite:
+  name: Mark Mao
+  tagline: Front End Engineer
+  date_format: "%b %-d, %Y"
+  sitemap: true
+  show_excerpts: true
+
+  social_links:
+      # twitter: thelehhman
+      # github:  thelehhman
+      # linkedIn: in/thelehhman # format: locale/username
+
+pagination:
+  # Site-wide kill switch, disabled here it doesn't run at all
+  enabled: true
+
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-paginate-v2
