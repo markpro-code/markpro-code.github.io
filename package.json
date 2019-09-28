@@ -1,0 +1,16 @@
+{
+  "name": "markpro-code.github.io",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/markpro-code/markpro-code.github.io.git",
+  "author": "markpro-code <markpro.code@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "toc": "node scripts/toc.js"
+  },
+  "devDependencies": {
+    "fs-extra": "^8.1.0",
+    "remark": "^11.0.1",
+    "remark-toc": "^6.0.0"
+  }
+}
