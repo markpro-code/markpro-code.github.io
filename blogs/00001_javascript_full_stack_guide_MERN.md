@@ -5,27 +5,19 @@ This is a guide for develop a web app with: Express.js + MogoDB + React.
 ## Table of Contents
 
 -   [Build Server](#build-server)
-
     -   [Three Layer Archtecture](#three-layer-archtecture)
-
     -   [Router: control request flow](#router-control-request-flow)
-
     -   [Controllers: handle request](#controllers-handle-request)
-
     -   [Services: implement business logic](#services-implement-business-logic)
-
     -   [DB Model](#db-model)
-
-    -   [Authentication](#authentication)
-
-        -   [Username and Password](#username-and-password)
-        -   [CAS](#cas)
-
+    -   [Authentication with Username and Password](#authentication-with-username-and-password)
+    -   [Authentication with CAS](#authentication-with-cas)
+    -   [Authentication with JWT](#authentication-with-jwt)
 -   [Build Client](#build-client)
-
 -   [Complexity Control](#complexity-control)
-
+    -   [Dependency Injection](#dependency-injection)
     -   [Customer Errors](#customer-errors)
+-   [Configuration](#configuration)
 
 ## Build Server
 
@@ -141,9 +133,7 @@ module.exports = {
 }
 ```
 
-### Authentication
-
-#### Username and Password
+### Authentication with Username and Password
 
 let's start with authentication strategy:
 
@@ -200,7 +190,7 @@ controllers/user.js
 ```javascript
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
-const user = require('../data-access/user')
+const user = require('../servcies/user')
 
 passport.use(new LocalStrategy(
     {
@@ -208,23 +198,16 @@ passport.use(new LocalStrategy(
         passwordField: 'password',  // request field for password
     },
     function(username, password, done) {
-        user.findOne({ username: username }, function(err, user) {
-            if (err) {
-                return done(err)
-            }
-
-            // user not found
-            if (!user) {
-                return done(null, false, { message: 'Incorrect username.' })
-            }
-
-            // find user, but wrong password
-            if (!user.validPassword(password)) {
-                return done(null, false, { message: 'Incorrect password.' })
-            }
-
-            return done(null, user)
-        })
+        user
+            .validateUser(username, password)
+            .then(result => {
+                if(result.pass){
+                    done(null, result.userInfo)
+                }else{
+                    done(null, false)
+                }
+            })
+            .catch(done)
     }
 ));
 
@@ -233,7 +216,7 @@ passport.serializeUser(function(user, done) {
     done(null, user.id);
 });
 
-//
+// deserialize user id from session
 passport.deserializeUser(function(id, done) {
     // retrieve user info from DB
     User.findById(id, function(err, user) {
@@ -251,23 +234,56 @@ const login = [
 
 const getUserInfo = [
     (req, res, next) => {
+        // this will trigger passport.deserializeUser() function call and retrieve user info
         sendData(res, res.user)
     }
 ]
 
 module.exports = {
-    login
+    login,
+    getUserInfo,
 }
 ```
 
 After user login successfully, express middleware function can get user info from subsequent request by `req.user`.
 
+services/user.js
 
-#### CAS
+```javascript
+const bcrypt = require('bcrypt')
+const UserModel = require('data-access/user')
+async function validateUser(username, password) {
+    return UserModel
+        // find user in DB
+        .findOne({ username })
+        .then(userInfo => {
+            if(userInfo == null) {
+                return { pass: false, message: 'incorrect username' }
+            }
+
+            return bcrypt.compare(password, userInfo.hashedPassword)
+                .then(equal => ({
+                    pass: equal,
+                    message: equal ? null : 'incorrect password',
+                    userInfo,
+                }))
+        })
+
+}
+
+module.export = {
+    validateUser
+}
+```
+
+[bcrypt](https://www.npmjs.com/package/bcrypt) is a node module for encrypt and decrypt. **Confidential data should always store encrypted**, we should only save hashed password in database. `bcrypt.compare(password, hashedPassword)` use to compare true password and hashed password.
+
+### Authentication with CAS
 
 Connect to Central Authentication Service is quite easy by [connect-cas2](https://www.npmjs.com/package/connect-cas2).
 
 app.js
+
 ```javascript
 const express = require('express')
 const session = require('express-session')
@@ -325,6 +341,7 @@ app.use(express.urlencoded({ extended: true }))
 ```
 
 controllers/user.js
+
 ```javascript
 const logout = [
     (req, res, next) => {
@@ -345,12 +362,26 @@ module.exports = {
 
 ```
 
+### Authentication with JWT
+
 ## Build Client
 
 ## Complexity Control
 
 As application grows, are you still able to hold it ?
 
+### Dependency Injection
+
+Also called Inversion of Control.
+[typedi](https://www.npmjs.com/package/typedi)
+
 ### Customer Errors
 
 Customer error can simplify validation process
+
+## Configuration
+
+[dotenv](https://www.npmjs.com/package/dotenv)
+[convict](https://www.npmjs.com/package/convict)
+
+configuration validation

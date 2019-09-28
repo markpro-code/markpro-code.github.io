@@ -5,7 +5,7 @@ const toc = require('remark-toc')
 
 const mdPath = path.resolve(__dirname, '../blogs/00001_javascript_full_stack_guide_MERN.md')
 remark()
-    .use(toc)
+    .use(toc, { tight: true })
     .process(
         fs.readFileSync(mdPath, 'utf8'),
         function(err, file) {
