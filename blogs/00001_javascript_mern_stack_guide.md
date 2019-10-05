@@ -18,6 +18,7 @@ This is a guide for develop a web app with: Express.js + MogoDB + React.
     -   [Dependency Injection](#dependency-injection)
     -   [Customer Errors](#customer-errors)
 -   [Configuration](#configuration)
+-   [Related Node Modules](#related-node-modules)
 
 ## Build Server
 
@@ -143,7 +144,7 @@ let's start with authentication strategy:
 4.  When the user visits other pages, the cookie with session id will be added to all the requests
 5.  Authenticate restricted pages with this cookie
 
-Use [passport.js](passport.js) and it's [passport-local](https://www.npmjs.com/package/passport-local) strategy can simplify the implementation.
+Use [passport.js](https://www.npmjs.com/package/passport) and it's [passport-local](https://www.npmjs.com/package/passport-local) strategy can simplify the implementation.
 
 app.js
 
@@ -280,6 +281,8 @@ module.export = {
 
 ### Authentication with CAS
 
+If you are not familiar with CAS, check out [How CAS Works](00002_how_cas_works.md).
+
 Connect to Central Authentication Service is quite easy by [connect-cas2](https://www.npmjs.com/package/connect-cas2).
 
 app.js
@@ -385,3 +388,27 @@ Customer error can simplify validation process
 [convict](https://www.npmjs.com/package/convict)
 
 configuration validation
+
+## Related Node Modules
+
+1.  [axios](https://www.npmjs.com/package/axios): request client form both clent and server
+
+server:
+
+1.  [express-validator](https://www.npmjs.com/package/express-validator): request validation
+2.  [mongoose](https://mongoosejs.com/): MongoDB data modeling.
+3.  [bcrypt](https://www.npmjs.com/package/bcrypt): encrypt and decrypt
+4.  [passport.js](https://www.npmjs.com/package/passport): authentication middleware
+5.  [connect-cas2](https://www.npmjs.com/package/connect-cas2): CAS authentication
+
+client:
+
+1.  [redux-devtools-extension](https://www.npmjs.com/package/redux-devtools-extension)
+1.  [redux](https://www.npmjs.com/package/redux), [react-redux](https://www.npmjs.com/package/react-redux): client state management
+1.  [react-router](https://www.npmjs.com/package/react-router), [react-router-dom](https://www.npmjs.com/package/react-router-dom): client router
+1.  [moment](https://www.npmjs.com/package/moment), [react-moment](https://www.npmjs.com/package/react-moment): time dispaly
+
+tools:
+
+1. [nodemon](https://www.npmjs.com/package/nodemon): automatically restart node server when file changes.
+1. [concurrently](https://www.npmjs.com/package/concurrently): run multiple commands concurrently, like start server app and client dev server at the same time.
