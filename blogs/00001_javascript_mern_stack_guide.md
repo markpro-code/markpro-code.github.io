@@ -1,6 +1,6 @@
-# Javascript Full Stack Guide
+# Javascript MERN Stack Guide
 
-This is a guide for develop a web app with: Express.js + MogoDB + React.
+This is a guide for develop a web app with: MongoDB + Express.js + React + Node (MERN).
 
 ## Table of Contents
 
@@ -13,6 +13,8 @@ This is a guide for develop a web app with: Express.js + MogoDB + React.
     -   [Authentication with Username and Password](#authentication-with-username-and-password)
     -   [Authentication with CAS](#authentication-with-cas)
     -   [Authentication with JWT](#authentication-with-jwt)
+    -   [Log Mangement](#log-mangement)
+    -   [Shutdown Server Gracefully](#shutdown-server-gracefully)
 -   [Build Client](#build-client)
 -   [Complexity Control](#complexity-control)
     -   [Dependency Injection](#dependency-injection)
@@ -367,6 +369,115 @@ module.exports = {
 
 ### Authentication with JWT
 
+### Log Mangement
+
+[log4js](https://www.npmjs.com/package/log4js) is handy module for logging, it has many [appenders](https://log4js-node.github.io/log4js-node/appenders.html) can perform log rotation.
+
+You can just create a simple express log middileware for logging http request.
+
+log_manager.js
+
+```javascript
+const path = require('path')
+const log4js = require('log4js')
+
+log4js.configure({
+    appenders: {
+        // standard output logger
+        stdout: {
+            type: 'stdout',
+        },
+
+        // file logger, daily per file, keep file of 30 days
+        file: {
+            type: 'dateFile',
+            filename: path.resolve('my_logfile_path'),
+            pattern: '.yyyy-MM-dd',
+            compress: false,
+            // keep old log file for 30 days
+            daysToKeep: 30,
+        },
+    },
+    categories: {
+        default: {
+            appenders: ['stdout', 'file'],
+            level: 'debug',
+        },
+    },
+})
+
+const logger = log4js.getLogger('my-awesome-app')
+logger.level = 'debug'
+
+function logMiddleware(req, res, next) {
+    logger.debug(`request [${req.method}]${req.originalUrl} payload=${JSON.stringify(req.body)}`)
+    next()
+}
+
+
+/**
+ *  shut down log service
+ */
+function shutdownLog() {
+    logger.info('shut down log4js')
+    return new Promise(((resolve, reject) => {
+        log4js.shutdown(() => resolve())
+    }))
+}
+
+module.exports = {
+    logger,
+    logMiddleware,
+    shutdownLog,
+}
+```
+
+app.js
+
+```javascript
+const { logMiddleware } = require('log_manager.js')
+// ...
+app.use(logMiddleware)
+// ...
+```
+
+### Shutdown Server Gracefully
+
+We need to make sure finish all cleanup work before server shutdown. [terminus](https://www.npmjs.com/package/@godaddy/terminus) is for that purpose, it has many hook functions for different phase of shotdown process.
+
+Normally, we need to handle two signals:
+
+1.  **SIGINT**: signal interrupt a process, this signal is generated when a user presses Ctrl+C.
+2.  **SIGTERM**: signal terminates a process, this signal is generated when run command like `kill proccess_id`.
+
+app.js
+
+```javascript
+const { createTerminus } = require('@godaddy/terminus')
+const { shutdownLog } = require('log_manager.js')
+// ...
+
+const app = express()
+
+// ...
+
+const server = http.createServer(app)
+createTerminus(server, {
+    timeout: 1000, // number of milliseconds before forceful exiting
+    signals: ['SIGTERM', 'SIGINT'],
+    async onSignal() {
+        console.info('server got shutdown signal, start cleanup ...')
+        // close DB connection
+        await dbManager.disconnectDB()
+        // shutdown log
+        shutdownLog()
+    },
+})
+
+server.listen(8080)
+
+```
+
 ## Build Client
 
 ## Complexity Control
@@ -400,15 +511,17 @@ server:
 3.  [bcrypt](https://www.npmjs.com/package/bcrypt): encrypt and decrypt
 4.  [passport.js](https://www.npmjs.com/package/passport): authentication middleware
 5.  [connect-cas2](https://www.npmjs.com/package/connect-cas2): CAS authentication
+6.  [terminus](https://www.npmjs.com/package/@godaddy/terminus): server gracefully shutdown
+7.  [log4js](https://www.npmjs.com/package/log4js): logging
 
 client:
 
 1.  [redux-devtools-extension](https://www.npmjs.com/package/redux-devtools-extension)
-1.  [redux](https://www.npmjs.com/package/redux), [react-redux](https://www.npmjs.com/package/react-redux): client state management
-1.  [react-router](https://www.npmjs.com/package/react-router), [react-router-dom](https://www.npmjs.com/package/react-router-dom): client router
-1.  [moment](https://www.npmjs.com/package/moment), [react-moment](https://www.npmjs.com/package/react-moment): time dispaly
+2.  [redux](https://www.npmjs.com/package/redux), [react-redux](https://www.npmjs.com/package/react-redux): client state management
+3.  [react-router](https://www.npmjs.com/package/react-router), [react-router-dom](https://www.npmjs.com/package/react-router-dom): client router
+4.  [moment](https://www.npmjs.com/package/moment), [react-moment](https://www.npmjs.com/package/react-moment): time dispaly
 
 tools:
 
-1. [nodemon](https://www.npmjs.com/package/nodemon): automatically restart node server when file changes.
-1. [concurrently](https://www.npmjs.com/package/concurrently): run multiple commands concurrently, like start server app and client dev server at the same time.
+1.  [nodemon](https://www.npmjs.com/package/nodemon): automatically restart node server when file changes.
+2.  [concurrently](https://www.npmjs.com/package/concurrently): run multiple commands concurrently, like start server app and client dev server at the same time.
