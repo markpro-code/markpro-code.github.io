@@ -2,6 +2,7 @@ node_modules
 _site
 **/*.swp
 **/*.swo
+*.log
 
 .sass-cache
 
