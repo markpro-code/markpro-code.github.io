@@ -4,7 +4,7 @@
 
 -   [AMD API](#amd-api)
 -   [Loading Script](#loading-script)
-    -   [load by <script> tag](#load-by-script-tag)
+    -   [load by script tag](#load-by-script-tag)
     -   [load by ajax request](#load-by-ajax-request)
 
 ## AMD API
@@ -14,9 +14,9 @@ according to [AMD API](https://github.com/amdjs/amdjs-api/wiki/AMD), AMD system 
     define(id?, dependencies?, factory);
 
 parameters:
-1\. `id`: a string literal specifies the id of the module being defined
-2\. `dependencies`: an array literal of the module ids that are dependencies
-3\. `factory`: function that should be executed to instantiate the module
+1. `id`: a string literal specifies the id of the module being defined
+2. `dependencies`: an array literal of the module ids that are dependencies
+3. `factory`: function that should be executed to instantiate the module
 
 simple define() implementation:
 
@@ -45,10 +45,10 @@ window.define = define
 ## Loading Script
 
 Generally speaking, there are two ways to load a script:
-1\. load by generate a script tag and assign `src` attribute
-1\. load script code by ajax request and then eval the code
+1. load by generate a script tag and assign `src` attribute
+1. load script code by ajax request and then eval the code
 
-### load by <script> tag
+### load by script tag
 
 ```javascript
 export function loadScript(url) {
