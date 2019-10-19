@@ -368,6 +368,12 @@ module.exports = {
 ```
 
 ### Authentication with JWT
+Bearer authentication (or token authentication) is an HTTP authentication scheme that involves security tokens called bearer tokens. The name "Bearer authentication" means "give access to the bearer of this token."
+
+Client need to send this token in the Authorization header:
+```
+Authorization: Bearer <token>
+```
 
 ### Log Mangement
 
